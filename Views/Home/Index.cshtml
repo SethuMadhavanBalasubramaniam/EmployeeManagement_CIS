@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<html>
+<head>
+    <link href='https://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet'>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/Images/Logo_icon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/Images/Logo_icon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <title>Caliber Interconnects - Employee Portal CIS</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style>
+        body {
+            font-family: 'Oxygen';
+        }
+        .home .overlap-image {
+            position: absolute;
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width:45%;
+        }
+    </style>
+</head>
+
+<body class="home">
+    <img src="/Images/LogoBlack.png" alt="Overlap Image" class="overlap-image">
+
+</body>
+</html>
+

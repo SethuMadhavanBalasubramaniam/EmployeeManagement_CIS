@@ -1,0 +1,412 @@
+﻿@model EmployeeManagement_CIS.Models.EmployeeModel
+@{
+    ViewBag.Title = "Index";
+}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet'>
+    <title>Employee Registration Form</title>
+    <style>
+      
+        .container {
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .form-control {
+            margin-bottom: 0px;
+        }
+
+        .form-control label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-decoration-color: #581845;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 0 0 48%;
+        }
+
+        .form-group:nth-child(odd) {
+            margin-right: 2%; 
+        }
+
+        .form-group:last-child {
+            margin-right: 0; 
+        }
+
+        .form-control input[type="text"],
+        .form-control input[type="date"],
+        .form-control select,
+        .form-control textarea {
+            width: 100%;
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .form-control input[type="submit"],
+        .form-control input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            /*background-color: #581845;*/
+            background-color: #1B4F72;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 30px;
+        }
+
+        .form-control select {
+            padding-right: 30px;
+            background-image: url('../../images/downarrow-expand.png');
+            background-position: 97%;
+            background-repeat: no-repeat;
+            background-size: 15px;
+        }
+
+        .form-control input[type="submit"]:hover,
+        .form-control input[type="button"]:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #000000;
+        }
+
+        .selected-page {
+            background-color: #1B4F72;
+            color: #fff;
+        }
+
+        .homepage-image {
+            position: relative;
+            width: 100%;
+        }
+
+        .homepage-image img {
+            width: 45%;
+            height: auto;
+            display: block;
+            opacity: 0.7;
+            transition: opacity 0.5s ease;
+            padding-top: 67px
+        }
+
+        .homepage-image img:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h4>Employee Registration Form</h4>
+        <form action="#" method="POST" class="form-control">
+            <div class="form-group">
+                <div class="form-row">
+                    @Html.HiddenFor(model => model.EmployeeID)
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.EmployeeName, "Employee Name:")
+                        @Html.EditorFor(model => model.EmployeeName, new { htmlAttributes = new { @class = "form-control", placeholder = "Enter Name" } })
+                        @Html.ValidationMessageFor(model => model.EmployeeName, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.EmployeeEmailID, "Email ID:")
+                        @Html.EditorFor(model => model.EmployeeEmailID, new { htmlAttributes = new { @class = "form-control", placeholder = "Enter Email ID" } })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.EmployeeDOB, "Date of Birth:")
+                        @Html.EditorFor(model => model.EmployeeDOB, new { htmlAttributes = new { @class = "form-control", @type = "date", placeholder = "Enter Date of Birth" } })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.EmployeeExperienceLevel_ID, "Experience Level:")
+                        @Html.DropDownListFor(model => model.EmployeeExperienceLevel_ID, (SelectList)ViewBag.ExperienceLevels, "Select Experience Level", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.EmployeeGender_ID, "Gender:")
+                        @Html.DropDownListFor(model => model.EmployeeGender_ID, (SelectList)ViewBag.Gender, "Select Gender", new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.EmployeeAddress, "Address:")
+                        @Html.TextAreaFor(model => model.EmployeeAddress, new { @class = "form-control", placeholder = "Enter Address" })
+                    </div>
+                    <div class="col-md-3">
+                        <input type="button" id="submitBtn" value="Submit" class="btn btn-primary" onclick="SaveEmployeeDetails()">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="button" id="clearBtn" value="Clear" class="btn btn-primary" onclick="ClearEmployeeDetails()">
+                    </div>
+                </div>
+            </div>
+
+
+        </form>
+
+
+    </div>
+    <div class="container">
+
+        <h4>Employee Details</h4>
+        <div class="row">
+            <div class="col-md-3">
+                <input type="text" id="searchInput" placeholder="Search..." class="form-control mb-3">
+            </div>
+            <div class="col-md-3">
+                <label id="lblTotal" style="padding-left: 10px; margin-top: 5px; font-weight: bold;"></label>
+            </div>
+        </div>
+        <table id="employeeTable" class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Date of Birth</th>
+                    <th>Experience Level</th>
+                    <th>Gender</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div id="pagination" class="mt-3"></div>
+    </div>
+
+
+
+</body>
+</html>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/Scripts/bootstrap.datepicker.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.com/libraries/bootstrap-datetimepicker/4.17.37"></script>
+<script src="~/Scripts/toastr.js"></script>
+<link href="~/Scripts/toastr.css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script>
+    //jQuery.noConflict();
+    //jQuery(document).ready(function ($) {
+
+    $("#EmployeeName").on("keypress", function (event) {
+        var keyCode = event.which;
+        if ((keyCode < 65 || keyCode > 90) && (keyCode < 97 || keyCode > 122) && keyCode !== 32) {
+            event.preventDefault();
+        }
+    });
+
+    var pageSize = 10;
+    var currentPage = 1;
+    var searchInput = $("#searchInput");
+    var paginationDiv = $("#pagination");
+
+
+    loadEmployeeData();
+
+    searchInput.on('input', function () {
+        loadEmployeeData();
+    });
+
+    function loadEmployeeData() {
+        debugger;
+        var searchKeyword = searchInput.val().trim();
+        var offset = (currentPage - 1) * pageSize;
+
+        $.ajax({
+            url: '/Employee/GetEmployeeDetails',
+            type: 'GET',
+            data: {
+                SearchKeyword: searchKeyword,
+                Offset: offset,
+                PageSize: pageSize
+            },
+            dataType: 'json',
+            success: function (response) {
+                var table = $('#employeeTable tbody');
+                table.empty();
+
+                if (response && response.data.length > 0) {
+                    for (var i = 0; i < response.data.length; i++) {
+                        var employee = response.data[i];
+                        var vhtml = '';
+                        var backgroundColor;
+                        switch (employee.EmployeeExperienceLevel_ID) {
+                            case 3:
+                                backgroundColor = '#E0FF95';
+                                break;
+                            case 2:
+                                backgroundColor = '#FFFED2';
+                                break;
+                            default:
+                                backgroundColor = '#FACDCD';
+                        }
+                        vhtml += '<td style="background-color: ' + backgroundColor + ';">' + ((currentPage - 1) * pageSize + i + 1) + '</td>';
+                        vhtml += '<td style="background-color: ' + backgroundColor + ';">' + employee.EmployeeID + '</td>';
+                        vhtml += '<td style="background-color: ' + backgroundColor + ';">' + employee.EmployeeName + '</td>';
+                        vhtml += '<td style="background-color: ' + backgroundColor + ';">' + employee.EmployeeEmailID + '</td>';
+                        vhtml += '<td style="background-color: ' + backgroundColor + ';">' + employee.EmployeeDOB + '</td>';
+                        vhtml += '<td style="background-color: ' + backgroundColor + ';">' + employee.EmployeeExperienceLevel + '</td>';
+                        vhtml += '<td style="background-color: ' + backgroundColor + ';">' + employee.EmployeeGender + '</td>';
+                        vhtml += '<td style="background-color: ' + backgroundColor + ';">' + employee.EmployeeAddress + '</td>';
+
+                        var row = $('<tr>').append(vhtml);
+                        table.append(row);
+                    }
+                    updatePagination(employee.TotalRecords);
+                    $("#lblTotal").text("Total No. of Employees: " + employee.TotalRecords);
+                } else {
+                    var messageRow = $('<tr>').append($('<td colspan="8">').text('No employee records found.'));
+                    table.append(messageRow);
+                    paginationDiv.empty();  
+                }
+            },
+            error: function (xhr, status, error) {
+                toastr.error("Error occurred while fetching employee", "Error")
+                console.error('Error occurred while fetching employee details:', error);
+            }
+        });
+    }
+
+    function updatePagination(totalRecords) {
+        //debugger;
+
+        var totalPages = Math.ceil(totalRecords / pageSize);
+        paginationDiv.empty();
+
+        var maxDisplayedPages = 5;
+        var currentPageIndex = Math.ceil(maxDisplayedPages / 2);
+
+        var startPage = Math.max(currentPage - currentPageIndex + 1, 1);
+        var endPage = Math.min(startPage + maxDisplayedPages - 1, totalPages);
+
+        for (var i = startPage; i <= endPage; i++) {
+            var pageLink = $('<a>').addClass('page-link').text(i).attr('href', '#');
+
+            if (i === currentPage) {
+                pageLink.addClass('selected-page');
+            }
+
+            pageLink.click(function (event) {
+                event.preventDefault();
+                currentPage = parseInt($(this).text());
+                loadEmployeeData();
+            });
+
+            var pageItem = $('<td>').addClass('page-item').append(pageLink);
+            paginationDiv.append(pageItem);
+        }
+
+        paginationDiv.css({
+            'overflow-x': 'auto',
+            'white-space': 'nowrap'
+        });
+    }
+
+
+
+
+    //});
+
+
+
+    function SaveEmployeeDetails() {
+        //debugger;
+        var formData = {
+            EmployeeID: $("#EmployeeID").val(),
+            EmployeeName: $("#EmployeeName").val(),
+            EmployeeEmailID: $("#EmployeeEmailID").val(),
+            EmployeeDOB: $("#EmployeeDOB").val(),
+            EmployeeExperienceLevel_ID: $("#EmployeeExperienceLevel_ID").val(),
+            EmployeeGender_ID: $("#EmployeeGender_ID").val(),
+            EmployeeAddress: $("#EmployeeAddress").val()
+        };
+        var isValid = validateEmail(formData.EmployeeEmailID);
+
+        if (formData.EmployeeName == "" || formData.EmployeeName == undefined || formData.EmployeeName == null) {
+            toastr.warning("Please enter the Name..!", "Warning");
+        }
+        else if (formData.EmployeeEmailID == "" || formData.EmployeeEmailID == undefined || formData.EmployeeEmailID == null) {
+            toastr.warning("Please enter the Email ID..!", "Warning");
+        }
+        else if (isValid == false) {
+            toastr.warning("Please enter the Valid Email ID..!", "Warning");
+        }
+        else if (formData.EmployeeDOB == "" || formData.EmployeeDOB == undefined || formData.EmployeeDOB == null) {
+            toastr.warning("Please select the Date of Birth..!", "Warning");
+        }
+        else if (formData.EmployeeExperienceLevel_ID == 0 || formData.EmployeeExperienceLevel_ID == undefined || formData.EmployeeExperienceLevel_ID == null) {
+
+            toastr.warning("Please select the Experience Level..!", "Warning");
+        }
+        else if (formData.EmployeeGender_ID == 0 || formData.EmployeeGender_ID == undefined || formData.EmployeeGender_ID == null) {
+
+            toastr.warning("Please select the Gender..!", "Warning");
+        }
+        else if (formData.EmployeeAddress == "" || formData.EmployeeAddress == undefined || formData.EmployeeAddress == null) {
+            toastr.warning("Please enter the Address..!", "Warning");
+        }
+        else {
+            $.ajax({
+                url: '/Employee/InsertUpdateEmployeeDetails',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    //debugger;
+                    if (response.success == true) {
+                        toastr.success(response.data, "Success");
+                    }
+                    else {
+                        toastr.error("Error occurred while saving employee", "Error");
+                    }
+                    loadEmployeeData();
+                },
+                error: function () {
+                    toastr.error("Error occurred while saving employee", "Error");
+                }
+
+
+            });
+
+            ClearEmployeeDetails();
+        }
+    }
+
+    function ClearEmployeeDetails() {
+        //debugger;
+        $("#EmployeeName").val("");
+        $("#EmployeeEmailID").val("");
+        $("#EmployeeDOB").val("");
+        $("#EmployeeExperienceLevel_ID").val("");
+        $("#EmployeeGender_ID").val("");
+        $("#EmployeeAddress").val("");
+        $("#EmployeeID").val(0)
+    }
+    function validateEmail(empEmail) {
+        var emailRegex = /^[^\s]+[^\s]+\.[^\s]+$/;
+        return emailRegex.test(empEmail);
+    }
+
+</script>
